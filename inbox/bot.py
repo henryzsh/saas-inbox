@@ -7,7 +7,9 @@ pessoa que descobrisse o bot poderia ler a sua caixa de entrada.
 from __future__ import annotations
 
 import logging
+import re
 import time
+import unicodedata
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
@@ -42,6 +44,21 @@ Escreva o que você procura. O padrão é <b>hoje</b>:
 Também aceito a sintaxe do Gmail direto:
 <code>from:vercel.com is:unread</code>
 <code>subject:fatura semana</code>"""
+
+
+# Quem manda "oi" quer descobrir o que dá para fazer, não buscar remetente "oi".
+SAUDACOES = {
+    "oi", "ola", "opa", "eae", "e ai", "hey", "hi", "hello", "alo",
+    "bom dia", "boa tarde", "boa noite", "teste", "test", "?", "menu",
+    "comandos", "help", "ajuda", "como funciona", "o que voce faz",
+}
+
+
+def _normalize(text: str) -> str:
+    """minúsculas, sem acento e sem pontuação — para casar saudações."""
+    plain = unicodedata.normalize("NFKD", text.lower())
+    plain = "".join(c for c in plain if not unicodedata.combining(c))
+    return re.sub(r"[^\w\s]", "", plain).strip()
 
 
 class Bot:
@@ -79,7 +96,10 @@ class Bot:
         text = text.strip()
         command = text.lower().split()[0] if text else ""
 
-        if command in ("/start", "/ajuda", "/help", "ajuda"):
+        if command in ("/start", "/ajuda", "/help"):
+            return [AJUDA]
+
+        if _normalize(text) in SAUDACOES:
             return [AJUDA]
 
         if command == "/hoje":
@@ -111,7 +131,11 @@ class Bot:
             return [f"⚠️ A busca falhou: <code>{telegram.escape(str(exc)[:200])}</code>"]
 
         if not messages:
-            return [f"📭 Nada encontrado para <b>{telegram.escape(query.label)}</b>."]
+            return [
+                f"📭 Nada encontrado para <b>{telegram.escape(query.label)}</b>.\n\n"
+                "Tente ampliar o período: <code>"
+                f"{telegram.escape(query.label.split(' · ')[0])} semana</code>  ·  /ajuda"
+            ]
         return digest.render_results(self.cfg, query.label, messages)
 
     # -- loop ---------------------------------------------------------------
