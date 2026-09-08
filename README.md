@@ -60,18 +60,30 @@ São três etapas: Google, Telegram e GitHub. ~20 minutos, uma vez só.
    > formal só é exigida para distribuir a terceiros.
 
 4. **Credentials → Create credentials → OAuth client ID → Desktop app**.
-   Baixe o JSON como `client_secret.json` na raiz deste projeto.
+
+   > Precisa ser do tipo **Desktop app**. Se você criou como *Web application*, o
+   > retorno em `localhost` é recusado — nesse caso adicione
+   > `http://localhost:8765/` em *Authorized redirect URIs*, ou apague e recrie
+   > como Desktop app.
+
+   Copie o **Client ID** e o **Client secret** para o `.env`. Não é preciso baixar
+   o JSON.
 
 5. Gere o refresh token:
 
    ```bash
    python -m venv .venv && .venv/bin/pip install -r requirements.txt
-   .venv/bin/python scripts/setup_oauth.py client_secret.json
+   .venv/bin/python scripts/setup_oauth.py
    ```
 
-   O script imprime uma URL. Abra no navegador (pode ser no Windows — o WSL
-   recebe o retorno em `localhost:8765`), autorize, e ele devolve os três valores
-   `GOOGLE_*` para você guardar.
+   O script lê o `client_id`/`client_secret` do `.env` e imprime uma URL. Abra no
+   navegador (pode ser no Windows — o WSL recebe o retorno em `localhost:8765`),
+   autorize com a sua conta, e ele devolve o `GOOGLE_REFRESH_TOKEN`.
+
+   Na tela "o Google não verificou este app", clique em **Avançado → Ir para (app)**.
+
+   > Se preferir usar o JSON baixado do console:
+   > `.venv/bin/python scripts/setup_oauth.py client_secret.json`
 
 ### 2. Telegram (entrega)
 
