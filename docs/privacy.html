@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Política de Privacidade — Inbox Digest</title>
+<style>
+  :root { color-scheme: light dark; }
+  body {
+    font: 16px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    max-width: 42rem; margin: 0 auto; padding: 3rem 1.25rem 5rem;
+  }
+  h1 { font-size: 1.7rem; margin-bottom: .25rem; }
+  .date { opacity: .65; margin-top: 0; font-size: .9rem; }
+  h2 { font-size: 1.1rem; margin-top: 2.25rem; }
+  ul { padding-left: 1.2rem; }
+  li { margin: .4rem 0; }
+  code { font-size: .9em; background: rgba(128,128,128,.15); padding: .1em .35em; border-radius: 3px; }
+  footer { margin-top: 3.5rem; padding-top: 1.25rem; border-top: 1px solid rgba(128,128,128,.3); font-size: .9rem; opacity: .75; }
+  a { color: inherit; }
+  .en { margin-top: 4rem; padding-top: 2rem; border-top: 2px solid rgba(128,128,128,.3); }
+</style>
+</head>
+<body>
+
+<h1>Política de Privacidade</h1>
+<p class="date">Inbox Digest — atualizada em 7 de setembro de 2026</p>
+
+<p>
+  O Inbox Digest é uma ferramenta pessoal, operada pelo próprio usuário, que resume
+  a caixa de entrada dele e entrega esse resumo no Telegram. Não há outros usuários,
+  não há empresa por trás e nenhum dado é comercializado.
+</p>
+
+<h2>Dados do Google acessados</h2>
+<p>
+  A ferramenta usa a Gmail API com o escopo
+  <code>https://www.googleapis.com/auth/gmail.modify</code> e acessa:
+</p>
+<ul>
+  <li><strong>Cabeçalhos das mensagens</strong>: remetente, assunto, data e o cabeçalho
+      <code>List-Unsubscribe</code>.</li>
+  <li><strong>Trecho de pré-visualização</strong> (snippet) fornecido pela própria API.</li>
+</ul>
+<p>
+  O corpo completo das mensagens e os anexos <strong>não são baixados</strong> — as
+  requisições usam o formato <code>metadata</code>, que não retorna esse conteúdo.
+</p>
+
+<h2>Como os dados são usados</h2>
+<ul>
+  <li>Selecionar mensagens conforme as regras de busca definidas pelo usuário.</li>
+  <li>Montar um resumo em texto e enviá-lo ao canal privado do usuário no Telegram.</li>
+  <li>Aplicar uma etiqueta às mensagens já resumidas, para não repeti-las.</li>
+</ul>
+<p>
+  A escrita se limita a aplicar essa etiqueta. A ferramenta não envia, não responde,
+  não move e não exclui e-mails.
+</p>
+
+<h2>Armazenamento e retenção</h2>
+<p>
+  Nenhum conteúdo de e-mail é gravado em banco de dados, arquivo ou log. Os dados
+  existem apenas na memória durante a execução e são descartados ao final. O único
+  registro persistente é a etiqueta aplicada dentro da própria conta Gmail do usuário.
+</p>
+<p>
+  As credenciais de acesso (token OAuth) ficam guardadas de forma cifrada em
+  GitHub Actions Secrets, acessíveis somente ao dono do repositório.
+</p>
+
+<h2>Compartilhamento</h2>
+<p>
+  Os dados não são vendidos, alugados nem compartilhados. O resumo é transmitido a um
+  único destino, escolhido pelo usuário: o Telegram, por meio da API oficial de bots,
+  sobre conexão HTTPS. Não há analytics, rastreadores, publicidade ou serviços de
+  terceiros.
+</p>
+<p>
+  O uso dos dados obtidos das APIs do Google segue a
+  <a href="https://developers.google.com/terms/api-services-user-data-policy">Política
+  de Dados do Usuário dos Serviços de API do Google</a>, incluindo os requisitos de
+  Uso Limitado (Limited Use).
+</p>
+
+<h2>Revogação de acesso</h2>
+<p>
+  O acesso pode ser revogado a qualquer momento em
+  <a href="https://myaccount.google.com/permissions">myaccount.google.com/permissions</a>.
+  A revogação invalida o token imediatamente e interrompe qualquer acesso futuro.
+</p>
+
+<h2>Contato</h2>
+<p>
+  Dúvidas sobre esta política: <a href="mailto:henrykaua21@gmail.com">henrykaua21@gmail.com</a>
+</p>
+
+<div class="en">
+<h1>Privacy Policy</h1>
+<p class="date">Inbox Digest — updated September 7, 2026</p>
+
+<p>
+  Inbox Digest is a personal, self-operated tool that summarizes its own user's inbox
+  and delivers that summary to Telegram. There are no other users, no company behind
+  it, and no data is sold.
+</p>
+
+<h2>Google data accessed</h2>
+<p>
+  The tool uses the Gmail API with the scope
+  <code>https://www.googleapis.com/auth/gmail.modify</code> and accesses message
+  <strong>headers</strong> (sender, subject, date, <code>List-Unsubscribe</code>) and the
+  API-provided <strong>snippet</strong>. Full message bodies and attachments are
+  <strong>never downloaded</strong> — requests use <code>metadata</code> format, which
+  does not return them.
+</p>
+
+<h2>How the data is used</h2>
+<p>
+  To select messages according to user-defined search rules, compose a text summary
+  sent to the user's own private Telegram chat, and apply a label to already-summarized
+  messages so they are not repeated. Write access is limited to applying that label:
+  the tool does not send, reply to, move, or delete email.
+</p>
+
+<h2>Storage and retention</h2>
+<p>
+  No email content is written to any database, file, or log. Data exists only in memory
+  during a run and is discarded when it ends. The only persistent record is the label
+  applied inside the user's own Gmail account. OAuth credentials are stored encrypted
+  in GitHub Actions Secrets, accessible only to the repository owner.
+</p>
+
+<h2>Sharing</h2>
+<p>
+  Data is not sold, rented, or shared. The summary is transmitted to a single
+  user-chosen destination — Telegram, via its official Bot API over HTTPS. There are no
+  analytics, trackers, ads, or third-party services. Use of data obtained from Google
+  APIs adheres to the
+  <a href="https://developers.google.com/terms/api-services-user-data-policy">Google API
+  Services User Data Policy</a>, including the Limited Use requirements.
+</p>
+
+<h2>Revoking access</h2>
+<p>
+  Access can be revoked at any time at
+  <a href="https://myaccount.google.com/permissions">myaccount.google.com/permissions</a>,
+  which invalidates the token immediately.
+</p>
+
+<h2>Contact</h2>
+<p><a href="mailto:henrykaua21@gmail.com">henrykaua21@gmail.com</a></p>
+</div>
+
+<footer>
+  <a href="index.html">← Início</a>
+</footer>
+
+</body>
+</html>

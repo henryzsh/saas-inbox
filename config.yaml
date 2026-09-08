@@ -1,0 +1,53 @@
+# ---------------------------------------------------------------------------
+# Regras do digest. Edite este arquivo — é aqui que você decide o que chega.
+#
+# `query` aceita a MESMA sintaxe da barra de busca do Gmail:
+#   from:  to:  subject:  label:  category:  has:  is:  older_than:  newer_than:
+#   filename:  larger:  -termo (negação)  (a OR b)  "frase exata"
+#
+# A ordem das categorias importa: um e-mail que casa com duas regras é
+# classificado na PRIMEIRA da lista (não aparece duplicado).
+# ---------------------------------------------------------------------------
+
+timezone: America/Sao_Paulo
+
+# Janela de busca. Só olha e-mails deste período (rede de segurança para o
+# caso da label de estado ser removida por engano).
+lookback: 2d
+
+# Label aplicada no Gmail após o envio. É ela que evita reenvio — o estado
+# mora no Gmail, não em arquivo. Criada automaticamente se não existir.
+sent_label: "Digest/Enviado"
+
+# Teto de e-mails por categoria em cada digest (evita mensagem gigante).
+max_per_category: 12
+
+# Se nenhuma categoria tiver e-mail, manda "nada novo" ou fica em silêncio?
+notify_when_empty: false
+
+categories:
+  - name: Pessoal e importante
+    emoji: "🔴"
+    query: "category:primary is:unread -from:me"
+
+  - name: Financeiro
+    emoji: "💰"
+    query: >-
+      is:unread (from:(nubank OR itau OR bradesco OR santander OR inter OR c6bank
+      OR mercadopago OR stripe) OR subject:(fatura OR boleto OR pagamento OR cobrança
+      OR "nota fiscal"))
+
+  - name: Trabalho
+    emoji: "💼"
+    query: "is:unread (from:(github.com OR linear.app OR notion.so OR slack.com) OR subject:(deploy OR incidente OR PR))"
+
+  # Exemplo de newsletter que você quer ler, separada do resto das promoções:
+  - name: Newsletters que eu leio
+    emoji: "📰"
+    query: "is:unread from:(stratechery.com OR tldr.tech OR newsletter.pragmaticengineer.com)"
+
+# Categorias que existem mas você NÃO quer no digest.
+# Ficam listadas aqui só para documentar a intenção — nada é enviado.
+ignore:
+  - "category:promotions"
+  - "category:social"

@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Inbox Digest</title>
+<style>
+  :root { color-scheme: light dark; }
+  body {
+    font: 16px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    max-width: 42rem; margin: 0 auto; padding: 3rem 1.25rem 5rem;
+  }
+  h1 { font-size: 1.9rem; margin-bottom: .25rem; }
+  .sub { opacity: .7; margin-top: 0; }
+  h2 { font-size: 1.15rem; margin-top: 2.5rem; }
+  ul { padding-left: 1.2rem; }
+  li { margin: .4rem 0; }
+  footer { margin-top: 3.5rem; padding-top: 1.25rem; border-top: 1px solid rgba(128,128,128,.3); font-size: .9rem; opacity: .75; }
+  a { color: inherit; }
+</style>
+</head>
+<body>
+
+<h1>Inbox Digest</h1>
+<p class="sub">Um resumo da sua caixa de entrada, filtrado pelas suas regras, entregue no Telegram.</p>
+
+<h2>O que faz</h2>
+<p>
+  O Inbox Digest é uma ferramenta pessoal de uso próprio. Em horários definidos por
+  você, ele consulta sua caixa de entrada usando regras de busca que você mesmo
+  escreve, agrupa os e-mails encontrados por categoria e envia esse resumo como
+  uma mensagem no Telegram.
+</p>
+
+<h2>Como funciona</h2>
+<ul>
+  <li>Você define as categorias e as regras de busca em um arquivo de configuração.</li>
+  <li>A ferramenta lê apenas <strong>cabeçalhos</strong> (remetente, assunto, data) e o
+      trecho de pré-visualização de cada mensagem — nunca o corpo completo do e-mail.</li>
+  <li>Os e-mails já resumidos recebem uma etiqueta, para que não sejam repetidos
+      no próximo envio.</li>
+  <li>O resumo é entregue no seu próprio canal privado do Telegram.</li>
+</ul>
+
+<h2>Privacidade</h2>
+<p>
+  Nenhum conteúdo de e-mail é armazenado, indexado ou compartilhado com terceiros.
+  Os detalhes estão na <a href="privacy.html">Política de Privacidade</a>.
+</p>
+
+<footer>
+  <a href="privacy.html">Política de Privacidade</a>
+</footer>
+
+</body>
+</html>
