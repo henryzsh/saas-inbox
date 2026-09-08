@@ -1,0 +1,19 @@
+services:
+  bot:
+    build: .
+    container_name: saas-inbox-bot
+    restart: unless-stopped
+
+    # Os segredos entram em tempo de execução — nunca vão para a imagem.
+    env_file: .env
+
+    # config.yaml montado de fora: editar as regras não exige rebuild,
+    # basta um `docker compose restart bot`.
+    volumes:
+      - ./config.yaml:/app/config.yaml:ro
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"

@@ -1,0 +1,11 @@
+.venv/
+.git/
+.github/
+__pycache__/
+*.pyc
+docs/
+.env
+client_secret*.json
+token.json
+bot.log
+README.md

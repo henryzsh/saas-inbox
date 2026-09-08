@@ -1,17 +1,16 @@
 # saas-inbox
 
-Digest da sua caixa do Gmail, filtrado pelas **suas** regras, entregue no Telegram.
-
-Roda no GitHub Actions (grátis, não precisa do seu PC ligado). O estado — o que já
-foi enviado — mora no próprio Gmail, como a label `Digest/Enviado`. Nada de banco
-nem de arquivo de estado: se você remover a label de um e-mail, ele volta no
-próximo digest.
+Consulte sua caixa do Gmail pelo Telegram. Você escreve `email da vercel`, ele
+devolve os e-mails da Vercel de hoje.
 
 ```
-Gmail API ──> config.yaml (regras) ──> agrupa por categoria ──> Telegram
-     ^                                                              |
-     └──────────── aplica label "Digest/Enviado" <──────────────────┘
+Telegram ──> "email da vercel" ──> from:(vercel) after:2026/09/07 ──> Gmail API
+    ^                                                                     |
+    └──────────────── resposta formatada <────────────────────────────────┘
 ```
+
+Há também um modo secundário — um digest por categorias, entregue em horário fixo
+via GitHub Actions. Vem desligado; veja [Digest agendado](#digest-agendado-opcional).
 
 ---
 
@@ -115,6 +114,72 @@ de Brasília) e também sob demanda pela aba **Actions → Run workflow**.
 
 ---
 
+## Usando o bot
+
+```bash
+.venv/bin/python bot.py
+```
+
+Enquanto esse processo estiver rodando, é só escrever no Telegram. O padrão é
+sempre **hoje**:
+
+| Você escreve | Ele busca |
+|---|---|
+| `email da vercel` | remetentes com "vercel", hoje |
+| `nubank ontem` | remetentes com "nubank", ontem |
+| `github semana` | últimos 7 dias |
+| `amazon 3d` | últimos 3 dias |
+| `boleto mes` | últimos 30 dias |
+| `from:vercel.com is:unread` | sintaxe do Gmail, passada direto |
+
+Períodos aceitos: `hoje` · `ontem` · `semana` · `mes` · `7d` (qualquer número) · `tudo`.
+
+Comandos: `/hoje` (resumo do dia por categoria), `/naolidos`, `/ajuda`.
+
+Palavras de ligação são ignoradas, então `me manda os emails do inter` e `inter`
+dão no mesmo. Se a busca por remetente não achar nada, ele amplia
+automaticamente para o assunto e o corpo antes de desistir.
+
+**O bot responde apenas ao `TELEGRAM_CHAT_ID` configurado.** Mensagens de qualquer
+outra pessoa são registradas no log e descartadas.
+
+### Deixando o bot no ar
+
+`bot.py` precisa de um processo vivo — ele não funciona no GitHub Actions, que só
+sabe rodar e encerrar.
+
+**Com Docker** (recomendado):
+
+```bash
+docker compose up -d --build
+docker compose logs -f          # acompanhar
+docker compose restart bot      # após editar config.yaml
+docker compose down             # parar
+```
+
+O `restart: unless-stopped` faz o bot voltar sozinho se travar ou se a máquina
+reiniciar. O `.env` é lido em tempo de execução e **não** entra na imagem; o
+`config.yaml` é montado de fora, então editar as regras só exige um restart.
+
+**Sem Docker**, direto no terminal:
+
+```bash
+nohup .venv/bin/python bot.py > bot.log 2>&1 &
+pkill -f "python bot.py"   # parar
+```
+
+> Em qualquer um dos dois, o bot só responde enquanto a máquina hospedeira estiver
+> ligada. Docker automatiza o restart, mas não substitui um host sempre ativo —
+> para 24/7 de verdade, suba o mesmo `docker compose` em um VPS.
+
+## Digest agendado (opcional)
+
+O modo original: um resumo por categorias, em horário fixo, via GitHub Actions.
+Vem **desligado**. Para ativar, descomente o bloco `schedule` em
+`.github/workflows/digest.yml` e crie os 5 secrets em *Settings > Secrets >
+Actions*. Nesse modo, os e-mails já enviados recebem a label `Digest/Enviado`
+para não repetirem — o estado mora no Gmail, não em arquivo.
+
 ## Definindo o que chega
 
 Tudo em [`config.yaml`](config.yaml). Cada categoria tem um nome, um emoji e uma
@@ -146,6 +211,7 @@ Duas regras de comportamento que valem lembrar:
 | Comando | O que faz |
 |---|---|
 | `scripts/doctor.py` | Valida credenciais, escopos e queries. Mostra só contagens, nunca assuntos. `--send` também manda uma mensagem de teste. |
+| `bot.py` | Sobe o bot interativo. É o modo principal. |
 | `run_digest.py --dry-run` | Mostra a prévia no terminal. Não envia, não marca nada. |
 | `run_digest.py --no-label` | Envia mas não marca — os mesmos e-mails voltam no próximo. Útil ao ajustar o formato. |
 | `run_digest.py` | Envia e marca. |
@@ -154,9 +220,12 @@ Duas regras de comportamento que valem lembrar:
 
 ```
 config.yaml              suas regras — o arquivo que você edita
-run_digest.py            entrypoint
+bot.py                   entrypoint do bot interativo
+run_digest.py            entrypoint do digest agendado
 inbox/config.py          carrega YAML + env, valida cedo
 inbox/gmail.py           OAuth, busca, leitura em lote (só cabeçalhos), labels
+inbox/bot.py             long polling, roteamento e allowlist
+inbox/parser.py          traduz texto livre em query do Gmail
 inbox/digest.py          aplica as regras, deduplica, formata
 inbox/telegram.py        envio + divisão no limite de 4096 caracteres
 scripts/doctor.py        checkup do setup ponta a ponta

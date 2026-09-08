@@ -21,13 +21,63 @@ def _trim(text: str, limit: int) -> str:
     return text if len(text) <= limit else text[: limit - 1].rstrip() + "…"
 
 
-def collect(gmail: Gmail, cfg: Config, sent_label_id: str) -> dict[str, list[Message]]:
-    """Roda a query de cada categoria; um e-mail só entra na primeira que casar."""
+def _item(m: Message, tz: ZoneInfo, show_date: bool = False) -> str:
+    """Um e-mail formatado: assunto clicável, remetente, horário e preview."""
+    stamp = ""
+    if m.date:
+        local = m.date.astimezone(tz)
+        stamp = local.strftime("%d/%m %H:%M") if show_date else local.strftime("%H:%M")
+    meta = " · ".join(filter(None, [escape(_trim(m.sender_name, 32)), stamp]))
+    item = (
+        f'\n\n<a href="{m.link}">{escape(_trim(m.subject, SUBJECT_CHARS))}</a>\n'
+        f"<i>{meta}</i>"
+    )
+    if m.snippet:
+        item += f"\n{escape(_trim(m.snippet, SNIPPET_CHARS))}"
+    return item
+
+
+def _pack(head: str, items: list[str], cont: str) -> list[str]:
+    """Agrupa itens sob um cabeçalho, abrindo novo bloco antes de estourar."""
+    blocks, parts, size = [], [], len(head)
+    for item in items:
+        if size + len(item) > BLOCK_LIMIT and parts:
+            blocks.append(head + "".join(parts))
+            head, parts, size = cont, [], len(cont)
+        parts.append(item)
+        size += len(item)
+    if parts:
+        blocks.append(head + "".join(parts))
+    return blocks
+
+
+def render_results(cfg: Config, label: str, messages: list[Message]) -> list[str]:
+    """Formata o resultado de uma busca sob demanda feita pelo bot."""
+    tz = ZoneInfo(cfg.timezone)
+    head = f"🔎 <b>{escape(label)}</b> · {len(messages)} encontrado(s)"
+    show_date = "hoje" not in label
+    return _pack(head, [_item(m, tz, show_date) for m in messages], "🔎 <b>cont.</b>")
+
+
+def collect(
+    gmail: Gmail,
+    cfg: Config,
+    sent_label_id: str = "",
+    exclude_sent: bool = True,
+    window: str = "",
+) -> dict[str, list[Message]]:
+    """Roda a query de cada categoria; um e-mail só entra na primeira que casar.
+
+    `exclude_sent=False` ignora a label de controle — é o que o /hoje do bot usa,
+    para mostrar o dia inteiro mesmo que algo já tenha sido enviado antes.
+    """
     seen: set[str] = set()
     by_category: dict[str, list[Message]] = {}
 
     for category in cfg.categories:
-        query = f"({category.query}) -label:{cfg.sent_label} newer_than:{cfg.lookback}"
+        skip = f" -label:{cfg.sent_label}" if exclude_sent else ""
+        period = window or f"newer_than:{cfg.lookback}"
+        query = f"({category.query}){skip} {period}"
         ids = [mid for mid in gmail.search(query, cfg.max_per_category * 2) if mid not in seen]
         if not ids:
             continue
@@ -64,15 +114,7 @@ def render(cfg: Config, by_category: dict[str, list[Message]]) -> list[str]:
         size = len(head)
 
         for m in messages:
-            when = m.date.astimezone(tz).strftime("%H:%M") if m.date else ""
-            meta = " · ".join(filter(None, [escape(_trim(m.sender_name, 32)), when]))
-            item = (
-                f'\n\n<a href="{m.link}">{escape(_trim(m.subject, SUBJECT_CHARS))}</a>\n'
-                f"<i>{meta}</i>"
-            )
-            if m.snippet:
-                item += f"\n{escape(_trim(m.snippet, SNIPPET_CHARS))}"
-
+            item = _item(m, tz)
             if size + len(item) > BLOCK_LIMIT and parts:
                 blocks.append(head + "".join(parts))
                 head = f"{icon} <b>{escape(name)}</b> · cont."

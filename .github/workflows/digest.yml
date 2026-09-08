@@ -1,11 +1,11 @@
 name: Digest da inbox
 
 on:
-  schedule:
-    # Horários em UTC. São Paulo é UTC-3 → 08:00 e 18:00 no seu fuso.
-    # O GitHub costuma atrasar alguns minutos em horários "redondos".
-    - cron: "5 11 * * *"
-    - cron: "5 21 * * *"
+  # O modo principal do projeto é o bot sob demanda (bot.py), não o digest
+  # agendado. Para receber o resumo em horário fixo também, descomente:
+  # schedule:
+  #   - cron: "5 11 * * *"   # 08:00 em São Paulo (UTC-3)
+  #   - cron: "5 21 * * *"   # 18:00
   workflow_dispatch:
     inputs:
       dry_run:
