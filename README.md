@@ -103,6 +103,7 @@ Local, para testar:
 
 ```bash
 cp .env.example .env      # preencha com os 5 valores
+.venv/bin/python scripts/doctor.py         # valida tudo antes de rodar
 .venv/bin/python run_digest.py --dry-run   # prévia no terminal, não envia nada
 .venv/bin/python run_digest.py             # envia de verdade
 ```
@@ -144,6 +145,7 @@ Duas regras de comportamento que valem lembrar:
 
 | Comando | O que faz |
 |---|---|
+| `scripts/doctor.py` | Valida credenciais, escopos e queries. Mostra só contagens, nunca assuntos. `--send` também manda uma mensagem de teste. |
 | `run_digest.py --dry-run` | Mostra a prévia no terminal. Não envia, não marca nada. |
 | `run_digest.py --no-label` | Envia mas não marca — os mesmos e-mails voltam no próximo. Útil ao ajustar o formato. |
 | `run_digest.py` | Envia e marca. |
@@ -157,6 +159,7 @@ inbox/config.py          carrega YAML + env, valida cedo
 inbox/gmail.py           OAuth, busca, leitura em lote (só cabeçalhos), labels
 inbox/digest.py          aplica as regras, deduplica, formata
 inbox/telegram.py        envio + divisão no limite de 4096 caracteres
+scripts/doctor.py        checkup do setup ponta a ponta
 scripts/setup_oauth.py   gera o refresh token (rodar uma vez)
 scripts/telegram_chat_id.py
 docs/                    home page + política de privacidade (GitHub Pages)
